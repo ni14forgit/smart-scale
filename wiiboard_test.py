@@ -5,6 +5,7 @@ import time
 import bluetooth
 import sys
 import subprocess
+import requests
 
 # --------- User Settings ---------
 WEIGHT_SAMPLES = 250
@@ -49,6 +50,8 @@ class EventProcessor:
                 self._weight = self._sum/WEIGHT_SAMPLES
                 self._measureCnt = 0
                 print str(self._weight) + " lbs"
+                URL = "http://127.0.0.1:5000/setweight?weight=" + str(int(self._weight))
+                r = requests.get(url = URL) 
             if not self._measured:
                 self._measured = True
 
