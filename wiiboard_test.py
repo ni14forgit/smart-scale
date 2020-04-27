@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import collections
-import socketio
+from socketIO_client import SocketIO, LoggingNamespace
 import time
 import bluetooth
 import sys
@@ -50,8 +50,11 @@ class EventProcessor:
                 self._weight = self._sum/WEIGHT_SAMPLES
                 self._measureCnt = 0
                 print(str(self._weight) + " lbs")
-                URL = "https://wiiboardapi.herokuapp.com/setweight?weight=" + str(int(self._weight))
-                r = requests.get(url = URL) 
+                with SocketIO("http://192.168.1.13", 5000, LoggingNamespace) as socketIO:
+                    socketIO.emit('flaskweight', int(self._weight))
+                    socketIO.wait_for_callbacks(seconds=1)
+                #URL = "https://wiiboardapi.herokuapp.com/setweight?weight=" + str(int(self._weight))
+                #r = requests.get(url = URL) 
             if not self._measured:
                 self._measured = True
 
