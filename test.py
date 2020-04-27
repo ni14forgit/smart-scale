@@ -15,7 +15,7 @@
 # def disconnect():
 #     print('disconnected from server')
 
-# sio.connect('http://192.168.1.13:5000/')
+# sio.connect('')
 # sio.wait()
 
 from socketIO_client import SocketIO, LoggingNamespace
@@ -23,7 +23,7 @@ from socketIO_client import SocketIO, LoggingNamespace
 def on_bbb_response(*args):
     print('on_bbb_response', args)
 
-with SocketIO("http://192.168.1.13", 5000, LoggingNamespace) as socketIO:
+with SocketIO("", 5000, LoggingNamespace) as socketIO:
     socketIO.emit('kate', 2070)
     socketIO.wait_for_callbacks(seconds=1)
 

@@ -2,10 +2,12 @@
 import collections
 from socketIO_client import SocketIO, LoggingNamespace
 import time
+import password
 import bluetooth
 import sys
 import subprocess
 import requests
+
 
 # --------- User Settings ---------
 WEIGHT_SAMPLES = 250
@@ -50,7 +52,7 @@ class EventProcessor:
                 self._weight = self._sum/WEIGHT_SAMPLES
                 self._measureCnt = 0
                 print(str(self._weight) + " lbs")
-                with SocketIO("http://192.168.1.13", 5000, LoggingNamespace) as socketIO:
+                with SocketIO(password.IP_ADDR, 5000, LoggingNamespace) as socketIO:
                     socketIO.emit('flaskweight', int(self._weight))
                     socketIO.wait_for_callbacks(seconds=1)
                 #URL = "https://wiiboardapi.herokuapp.com/setweight?weight=" + str(int(self._weight))
