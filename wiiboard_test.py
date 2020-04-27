@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-
 import collections
+import socketio
 import time
 import bluetooth
 import sys
@@ -38,7 +38,7 @@ class EventProcessor:
 
     def mass(self, event):
         if self._measureCnt == 1:
-            print "Measuring ..."
+            print("Measuring ...")
         
         if (event.totalWeight > 2):
             self._events[self._measureCnt] = event.totalWeight*2.20462
@@ -49,7 +49,7 @@ class EventProcessor:
                     self._sum += self._events[x]
                 self._weight = self._sum/WEIGHT_SAMPLES
                 self._measureCnt = 0
-                print str(self._weight) + " lbs"
+                print(str(self._weight) + " lbs")
                 URL = "https://wiiboardapi.herokuapp.com/setweight?weight=" + str(int(self._weight))
                 r = requests.get(url = URL) 
             if not self._measured:
@@ -107,21 +107,21 @@ class Wiiboard:
     # Connect to the Wiiboard at bluetooth address <address>
     def connect(self, address):
         if address is None:
-            print "Non existant address"
+            print ("Non existant address")
             return
         self.receivesocket.connect((address, 0x13))
         self.controlsocket.connect((address, 0x11))
         if self.receivesocket and self.controlsocket:
-            print "Connected to Wiiboard at address " + address
+            print ("Connected to Wiiboard at address ")+ address
             self.status = "Connected"
             self.address = address
             self.calibrate()
             useExt = ["00", COMMAND_REGISTER, "04", "A4", "00", "40", "00"]
             self.send(useExt)
             self.setReportingType()
-            print "Wiiboard connected"
+            print ("Wiiboard connected")
         else:
-            print "Could not connect to Wiiboard at address " + address
+            print ("Could not connect to Wiiboard at address " + address)
 
     def receive(self):
         while self.status == "Connected" and not self.processor.done:
@@ -140,7 +140,7 @@ class Wiiboard:
             elif intype == EXTENSION_8BYTES:
                 self.processor.mass(self.createBoardEvent(data[2:12]))
             else:
-                print "ACK to data write received"
+                print ("ACK to data write received")
 
     def disconnect(self):
         if self.status == "Connected":
@@ -155,19 +155,19 @@ class Wiiboard:
             self.controlsocket.close()
         except:
             pass
-        print "WiiBoard disconnected"
+        print ("WiiBoard disconnected")
 
     # Try to discover a Wiiboard
     def discover(self):
-        print "Press the red sync button on the board now"
+        print ("Press the red sync button on the board now")
         address = None
         bluetoothdevices = bluetooth.discover_devices(duration=6, lookup_names=True)
         for bluetoothdevice in bluetoothdevices:
             if bluetoothdevice[1] == BLUETOOTH_NAME:
                 address = bluetoothdevice[0]
-                print "Found Wiiboard at address " + address
+                print ("Found Wiiboard at address " + address)
         if address is None:
-            print "No Wiiboards discovered."
+            print ("No Wiiboards discovered.")
         return address
 
     def createBoardEvent(self, bytes):
@@ -180,14 +180,14 @@ class Wiiboard:
         if state == BUTTON_DOWN_MASK:
             buttonPressed = True
             if not self.buttonDown:
-                print "Button pressed"
+                print ("Button pressed")
                 self.buttonDown = True
 
         if not buttonPressed:
             if self.lastEvent.buttonPressed:
                 buttonReleased = True
                 self.buttonDown = False
-                print "Button released"
+                print ("Button released")
 
         rawTR = (int(bytes[0].encode("hex"), 16) << 8) + int(bytes[1].encode("hex"), 16)
         rawBR = (int(bytes[2].encode("hex"), 16) << 8) + int(bytes[3].encode("hex"), 16)
@@ -277,7 +277,7 @@ def main():
 
     board = Wiiboard(processor)
     if len(sys.argv) == 1:
-        print "Discovering board..."
+        print ("Discovering board...")
         address = board.discover()
     else:
         address = sys.argv[1]
@@ -290,7 +290,7 @@ def main():
     except:
         pass
 
-    print "Trying to connect..."
+    print ("Trying to connect...")
     board.connect(address)  # The wii board must be in sync mode at this time
     board.wait(200)
     # Flash the LED so we know we can step on.
